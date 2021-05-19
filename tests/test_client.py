@@ -29,7 +29,7 @@ class MyTestCase(unittest.TestCase):
         self.assertGreater(len(data), 0)
 
     def test_get_metadata(self):
-        data = self.client.get_metadata(dois=dois) 
+        data = self.client.get_metadata(dois=dois)
         self.assertEqual(len(data), len(dois))
 
     def test_get_citation_count(self):
