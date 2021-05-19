@@ -14,6 +14,16 @@ Access all the API endpoints available in OpenCitations to date:
 * [/citation-count/{doi}](https://opencitations.net/index/api/v1#/citation-count/{doi})
 * [/reference-count/{doi}](https://opencitations.net/index/api/v1#/reference-count/{doi})
 
+## Installation
+
+Easilly install the `opencitingpy` package via pip.
+
+```bash
+pip install opencitingpy
+```
+
+## Usage
+
 You may use the OpenCitations easily as follows:
 
 ```python
