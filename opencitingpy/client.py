@@ -2,6 +2,8 @@
 
 import requests
 
+from .classes import Citation, Metadata
+
 API_URL = 'https://w3id.org/oc/index/api/v1'
 
 
@@ -28,34 +30,57 @@ class Client:
         data = self.__make_request(uri)
         return data
 
-    def get_references(self, doi, **kwargs):
+    def __parse_citation_data(self, data):
+        parsed_data = [Citation(d) for d in data]
+        return parsed_data
+
+    def __parse_counts(self, data):
+        if len(data):
+            counts = int(data[0]['count'])
+        else:
+            counts = 0
+        return counts
+
+
+    def get_references(self, doi, parse_data=True, **kwargs):
         """
         This operation retrieves the citation data for all the outgoing references to other
         cited works appearing in the reference list of the bibliographic entity identified by the input DOI.
 
         :param doi: A valid Digital Object Identifier (DOI) e.g. '10.3390/s19020353'
         :type doi: str
+        :param parse_data: (Default True) Whether to parse data with opencitingpy.classes.Citation
+        :type parse_data: bool
         :param kwargs:
         :return:
         """
         operation = 'references'
         data = self.__get_data(operation, doi)
+        if parse_data:
+            data = self.__parse_citation_data(data)
         return data
 
-    def get_citation(self, oci, **kwargs):
+    def get_citation(self, oci, parse_data=True, **kwargs):
         """
         This operation retrieves the citation metadata for the citation identified by
-        the input Open Citation Identifier (OCI).
+        the input Open Citation Identifier (OCI). The Open Citation Identifier is a globally unique persistent
+        identifier for bibliographic citations, which has a simple structure: the lower-case letters "oci" followed
+        by a colon, followed by two numbers separated by a dash (XXXXXX-YYYYYY)
 
-        :param oci:
+        :param oci: Open Citation Identifier (OCI)
+        :type oci: str
+        :param parse_data: (Default True) Whether to parse data with opencitingpy.classes.Citation
+        :type parse_data: bool
         :param kwargs:
         :return:
         """
         operation = 'citation'
         data = self.__get_data(operation, oci)
+        if parse_data:
+            data = self.__parse_citation_data(data)
         return data
 
-    def get_citations(self, doi, **kwargs):
+    def get_citations(self, doi, parse_data=True, **kwargs):
         """
         This operation retrieves the citation data for all the references appearing in the reference lists of other
         citing works to the bibliographic entity identified by the input DOI, that constitute the incoming citations
@@ -63,20 +88,26 @@ class Client:
 
         :param doi: A valid Digital Object Identifier (DOI) e.g. '10.3390/s19020353'
         :type doi: str
+        :param parse_data: (Default True) Whether to parse data with opencitingpy.classes.Citation
+        :type parse_data: bool
         :param kwargs:
         :return:
         """
         operation = 'citations'
         data = self.__get_data(operation, doi)
+        if parse_data:
+            data = self.__parse_citation_data(data)
         return data
 
-    def get_metadata(self, dois, **kwargs):
+    def get_metadata(self, dois, parse_data=True, **kwargs):
         """
         This operation retrieves the bibliographic metadata for each of the bibliographic
         entities identified by one or more input DOIs.
 
         :param dois: A list of Digital Object Identifierers (DOIs) e.g. ['10.3390/s19020353', '10.3390/s19143113']
         :type dois: list
+        :param parse_data: (Default True) Whether to parse data with opencitingpy.classes.Metadata
+        :type parse_data: bool
         :param kwargs:
         :return:
         """
@@ -86,6 +117,8 @@ class Client:
             dois = [dois]
         dois = '__'.join(dois)
         data = self.__get_data(operation, dois)
+        if parse_data:
+            data = [Metadata(d) for d in data]
         return data
 
     def get_citation_count(self, doi, **kwargs):
@@ -100,7 +133,8 @@ class Client:
         """
         operation = 'citation-count'
         data = self.__get_data(operation, doi)
-        return data
+        counts = self.__parse_counts(data)
+        return counts
 
     def get_reference_count(self, doi, **kwargs):
         """
@@ -114,4 +148,5 @@ class Client:
         """
         operation = 'reference-count'
         data = self.__get_data(operation, doi)
-        return data
+        counts = self.__parse_counts(data)
+        return counts
