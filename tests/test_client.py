@@ -30,6 +30,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_get_metadata(self):
         data = self.client.get_metadata(dois=dois)
+        print(data[0])
         self.assertEqual(len(data), len(dois))
 
     def test_get_citation_count(self):
